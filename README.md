@@ -1,4 +1,4 @@
-The Synesthesia Engine: Algorithmic Image-to-Audio Mapping
+pythonThe Synesthesia Engine: Algorithmic Image-to-Audio Mapping
 🎨 ➔ 🎵
 
 The Synesthesia Engine is an interdisciplinary computer science tool designed to bridge the gap between visual arts and auditory composition. By leveraging Unsupervised Machine Learning (K-Means Clustering), the system extracts the dominant mathematical properties of an image and translates them into harmonious musical sequences.
@@ -15,19 +15,17 @@ Real-time Processing: Optimized image down-sampling for near-instantaneous feedb
 
 Web Audio Integration: High-fidelity synthesis powered by Tone.js.
 
-
 🛠️ Technology Stack
 
-Backend: Python 3.x / Flask 
+Backend: Python 3.x / Flask
 
-Machine Learning: Scikit-learn (K-Means Clustering) 
+Machine Learning: Scikit-learn (K-Means Clustering)
 
-Image Analysis: Pillow (PIL), NumPy 
+Image Analysis: Pillow (PIL), NumPy
 
 Frontend: JavaScript, HTML5, CSS3
 
 Audio Engine: Tone.js (Web Audio API wrapper)
-
 
 📥 Installation & Setup
 
@@ -40,14 +38,14 @@ git clone https://github.com/georgejoseph753/Synesthesia-Engine.git
 cd Synesthesia-Engine
 
 Create a virtual environment (Recommended):
-    
+
 Bash
 
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate # On Windows: venv\Scripts\activate
 
 Install dependencies:
-    
+
 Bash
 
 pip install -r requirements.txt
@@ -59,7 +57,6 @@ python app.py
 
 Access the UI:
 Open your browser and navigate to http://127.0.0.1:5000.
-
 
 📖 Methodology & Design
 
@@ -77,14 +74,13 @@ Mapping: Hue determines the note; Lightness determines the octave.
 
 Output: A generated arpeggio is played back via the Web Audio API.
 
-
 📝 Academic Context
 
 This project was developed as part of the DLMCSPCSP01 - Project: Computer Science portfolio. It demonstrates the application of machine learning techniques to solve the real-world problem of creative block in multimedia artists.
 
 Author: George Joseph
 
-Course: Master in Computer Science (DLMCSPCSP01) 
+Course: Master in Computer Science (DLMCSPCSP01)
 
 🛡️ License
 

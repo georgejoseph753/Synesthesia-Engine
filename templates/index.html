@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Synesthesia Engine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        text-align: center;
+        padding: 50px;
+        background-color: #f4f4f9;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .color-palette {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 10px;
+      }
+      .color-box {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        transition: transform 0.2s;
+      }
+      .color-box:hover {
+        transform: scale(1.1);
+        cursor: pointer;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      input[type="file"] {
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>The Synesthesia Engine</h2>
+      <p>
+        Upload an image to extract dominant colors and generate a mapped musical
+        chord.
+      </p>
+
+      <input type="file" id="imageInput" accept="image/*" />
+      <br />
+      <button onclick="analyzeImage()">Generate Audio Palette</button>
+
+      <div class="color-palette" id="palette"></div>
+      <p id="status"></p>
+    </div>
+
+    <script>
+      function hexToHSL(H) {
+        let r = 0,
+          g = 0,
+          b = 0;
+        if (H.length == 7) {
+          r = "0x" + H[1] + H[2];
+          g = "0x" + H[3] + H[4];
+          b = "0x" + H[5] + H[6];
+        }
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        let cmin = Math.min(r, g, b),
+          cmax = Math.max(r, g, b),
+          delta = cmax - cmin,
+          h = 0,
+          s = 0,
+          l = 0;
+
+        if (delta == 0) h = 0;
+        else if (cmax == r) h = ((g - b) / delta) % 6;
+        else if (cmax == g) h = (b - r) / delta + 2;
+        else h = (r - g) / delta + 4;
+
+        h = Math.round(h * 60);
+        if (h < 0) h += 360;
+        l = (cmax + cmin) / 2;
+        return { hue: h, lightness: l * 100 };
+      }
+
+      function colorToNote(hexColor) {
+        const hsl = hexToHSL(hexColor);
+        const scale = ["C", "D", "E", "G", "A"]; // Pentatonic
+        const noteIndex = Math.floor((hsl.hue / 360) * scale.length);
+        const baseNote = scale[noteIndex];
+
+        let octave = 4;
+        if (hsl.lightness < 33) octave = 3;
+        else if (hsl.lightness > 66) octave = 5;
+
+        return baseNote + octave;
+      }
+
+      async function analyzeImage() {
+        const fileInput = document.getElementById("imageInput");
+        if (fileInput.files.length === 0) {
+          alert("Please select an image first.");
+          return;
+        }
+
+        document.getElementById("status").innerText =
+          "Running K-Means Clustering...";
+        document.getElementById("palette").innerHTML = "";
+
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+
+        try {
+          const response = await fetch("/analyze", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          if (data.error) {
+            document.getElementById("status").innerText =
+              "Error: " + data.error;
+            return;
+          }
+
+          document.getElementById("status").innerText =
+            "Click the colors to hear their mapped frequencies!";
+
+          await Tone.start();
+          const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+
+          let now = Tone.now();
+          data.colors.forEach((hex, index) => {
+            const note = colorToNote(hex);
+            const box = document.createElement("div");
+            box.className = "color-box";
+            box.style.backgroundColor = hex;
+            box.title = `Note: ${note}`;
+
+            box.onclick = () => synth.triggerAttackRelease(note, "8n");
+            document.getElementById("palette").appendChild(box);
+
+            synth.triggerAttackRelease(note, "8n", now + index * 0.3);
+          });
+        } catch (error) {
+          document.getElementById("status").innerText = "Network Error.";
+        }
+      }
+    </script>
+  </body>
+</html>
