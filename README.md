@@ -56,7 +56,7 @@ Bash
 python app.py
 
 Access the UI:
-Open your browser and navigate to http://127.0.0.1:5000.
+Open your browser and navigate to http://127.0.0.1:5001.
 
 📖 Methodology & Design
 
